@@ -1,5 +1,5 @@
 # QueryParser
-Parse a querystring, maintaining &amp; in values
+Parse a querystring, maintaining '&amp;' or ''=' in values
 
 This small library can parse a querystring where values may contain '&' or '=' which wrecks the usual parsing.
 
