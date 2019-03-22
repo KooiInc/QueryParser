@@ -1,6 +1,6 @@
 module.exports = {
   Query: {
-    parse: function parseQuery(query, convert) {
+    parse: function parseQuery(query, convertValues2TypesIfPossible, errorExtra = {}) {
       const tryParse2Type = value => {
         try {
           return JSON.parse(value);
@@ -19,7 +19,7 @@ module.exports = {
         return key;
       };
       const cleanup = str => str.replace(/\^&/g, "&");
-      const cleanQueryOrError = initialize();
+      const cleanQueryOrError = initialize(errorExtra);
       return cleanQueryOrError.error ? cleanQueryOrError : parse(cleanQueryOrError);
 
       function parse(cleanQueryOrError) {
@@ -33,11 +33,11 @@ module.exports = {
           .reduce((converted, key) =>
             ({
               ...converted,
-              [key]: convert ? tryParse2Type(cleanup(result[key])) : cleanup(result[key])
+              [key]: convertValues2TypesIfPossible ? tryParse2Type(cleanup(result[key])) : cleanup(result[key])
             }), {}
           );
 
-        while (queryChars[0]) {
+        do {
           if ((currentChar === "&" && !/\s/.test(queryChars[0]) && prevChar !== "^")) {
             try {
               currentKey = tryParseKey(queryChars);
@@ -57,14 +57,17 @@ module.exports = {
           }
           prevChar = currentChar;
           currentChar = queryChars.shift();
-        }
+        } while (queryChars[0]);
+        
+        currentChar && (result[currentKey] += currentChar);
+
         return convertAndCleanupResult(result);
       }
 
-      function initialize() {
+      function initialize(errorExtra) {
         let errorResult = {
+          ...errorExtra,
           error: true,
-          action: "noparamaction",
         };
 
         try {
@@ -72,14 +75,14 @@ module.exports = {
         } catch {
           return {
             ...errorResult,
-            message: `Kon niet decoden of anderszins fout voor: ${query}`
+            message: `Decoding not possible or unspecified error for: ${query}`
           };
         }
 
         if (!/[&=]/g.test(query)) {
           return {
             ...errorResult,
-            message: `Does not seem to be a querystring: ${query}`
+            message: `${query} ... Does not seem to be a querystring`
           };
         }
 
