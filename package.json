@@ -1,0 +1,15 @@
+{
+  "name": "queryparser",
+  "version": "1.0.0",
+  "description": "Parse querystring",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "querystring",
+    "parse"
+  ],
+  "author": "NICon",
+  "license": "ISC"
+}
