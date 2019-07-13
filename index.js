@@ -4,7 +4,7 @@ module.exports = {
   }
 };
 
-function parseQuery(query, convertValues2TypesIfPossible, errorExtra = {}) {
+function parseQuery(query, convertValues2TypesIfPossible, extraCollection = {}) {
   const tryParse2Type = value => {
     try {
       return JSON.parse(value);
@@ -23,7 +23,7 @@ function parseQuery(query, convertValues2TypesIfPossible, errorExtra = {}) {
     return key;
   };
   const cleanup = str => str.replace(/\^&/g, "&");
-  const cleanQueryOrError = initialize(errorExtra);
+  const cleanQueryOrError = initialize(extraCollection);
 
   return cleanQueryOrError.error ? cleanQueryOrError : parse(cleanQueryOrError);
 
@@ -48,9 +48,10 @@ function parseQuery(query, convertValues2TypesIfPossible, errorExtra = {}) {
           currentKey = tryParseKey(workingQuery);
         } catch (error) {
           return {
+            ...extraCollection,
             error: true,
             initialString: query,
-            errorMssg: `Can't create key`,
+            errorMssg: `Key parsing failed`,
             stack: error.stack,
           };
         }
@@ -70,19 +71,20 @@ function parseQuery(query, convertValues2TypesIfPossible, errorExtra = {}) {
     return cleanupResult(result);
   }
 
-  function initialize(errorExtra) {
+  function initialize(extraCollection) {
     let errorResult = {
-      ...errorExtra,
+      ...extraCollection,
       error: true,
     };
 
     try {
       query = decodeURIComponent(query.replace(/\+/g, " "));
-    } catch {
+    } catch(error) {
       return {
         ...errorResult,
         initialQuery: query,
-        message: `Decoding not possible or unspecified error`
+        message: `Decoding not possible or unspecified error`,
+        stack: error.stack,
       };
     }
 
@@ -90,7 +92,7 @@ function parseQuery(query, convertValues2TypesIfPossible, errorExtra = {}) {
       return {
         ...errorResult,
         initialQuery: query,
-        message: `The query oes not seem to be a querystring`
+        message: `This query does not seem to be a querystring`
       };
     }
 

@@ -16,4 +16,4 @@ Parsing the example with this library results in:
 ```
 
 ### Not a panacea
-The library is not a panacea for all querystring problems one may encounter. If you want to circumvent querystring problems, don't use `GET` requests for keys with a lot of content in its value. In other words: keep your querystring as simple as possible and use `POST` for large queries. Alternatively you can use nodejs' `Querystring.parse`, using your own delimiters, or write your own parser for that. 
+The library is not a panacea for all querystring problems one may encounter. If you want to circumvent querystring problems, don't use `GET` requests for keys with a lot of content in its value. In other words: keep your querystring as simple as possible and use `POST` for large queries. Alternatively you can use nodejs' `Querystring.parse`, or use your own delimiters (so, not & and/or =) and write your own parser for that. 
